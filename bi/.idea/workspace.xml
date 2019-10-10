@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="86447654-edcf-4ae5-a049-be65ac594ae0" name="Default Changelist" comment="test change">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hds/cn/bi/controller/DataReport.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hds/cn/bi/controller/DataReport.java" afterDir="false" />
-    </list>
+    <list default="true" id="86447654-edcf-4ae5-a049-be65ac594ae0" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +23,7 @@
   <component name="ProjectId" id="1RxckJIB3Tu2mfbFpVSuYWGGFTs" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../hdsbi" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -80,6 +77,14 @@
       <option name="presentableId" value="Default" />
       <updated>1570612328172</updated>
     </task>
+    <task id="LOCAL-00001" summary="test change">
+      <created>1570675257189</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1570675257189</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -94,5 +99,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="test change" />
+    <option name="LAST_COMMIT_MESSAGE" value="test change" />
   </component>
 </project>
