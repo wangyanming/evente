@@ -1,0 +1,33 @@
+server:
+  port: 8761
+  
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: hdsbi
+    
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:mosh123456@localhost:8760/eureka/
+  instance:
+    #每10s向服务端发送一次心跳
+    lease-renewal-interval-in-seconds: 10
+    #通知服务端，如果60秒没有发送心跳，将我提出掉
+    lease-expiration-duration-in-seconds: 60
+
+#配置hystrix      
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'hystrix.stream'
+
+mybatis:
+  mapper-locations: classpath*:src/main/java/com/hdsbi/mapper/*.xml
+
+#showSql
+logging:
+  level: 
+    com.hdsbi.mapper : debug

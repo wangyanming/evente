@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdsbi.mapper.QueryByCkMapper">
+	<select id="overview" resultType="java.util.HashMap" parameterType="java.util.Map">
+		select t1._app_id,t2.amount,t1.uv,round(divide(orderCnt,uv),2) rate from 
+		(select count(distinct distinct_id) uv,_app_id from ${project}.em_events_dis where toDate(time)='${day}' and event='ViewProduct' group by _app_id) t1 
+		left join 
+		(select count(distinct distinct_id) orderCnt,sum(order_money) amount,_app_id from ${project}.em_events_dis where toDate(time)='${day}' and event='PaidOrder' group by _app_id) t2 
+		on t1._app_id=t2._app_id
+	</select>
+
+	<select id="eventAnalysis" resultType="java.util.HashMap" parameterType="java.util.Map">
+		select 
+			<if test="unit == 'minute'">
+				concat(formatDateTime(time,'%F %R'), ':00') unit,
+			</if> 
+			<if test="unit == 'hour'">
+				concat(formatDateTime(time, '%F %I'), ':00:00') unit,
+			</if>
+			<if test="unit == 'day'">
+				concat(formatDateTime(time, '%F'), ' 00:00:00') unit,
+			</if>
+			<if test="unit == 'week'">
+				concat(formatDateTime(toMonday(time), '%F'), ' 00:00:00') unit,
+			</if>
+			<if test="unit == 'month'">
+				concat(formatDateTime(time,'%Y-%m'), '-01 00:00:00') unit,
+			</if>
+			<if test="unit == 'year'">
+				concat(formatDateTime(time,'%Y'), '-01-01 00:00:00') unit,
+			</if>
+			${aggregator}
+			<foreach collection="field" item="item" separator="+" open="(" close=")">
+				${item} 
+			</foreach>
+			field
+			from ${project}.em_events_dis
+			where toDate(time) between '${startDate}' and '${endDate}' and event='${eventName}' 
+			and _app_id in 
+			<foreach collection="_app_id" item="item" separator="," open="(" close=")">
+				'${item}'
+			</foreach>
+			
+			<if test="orgId != null and orgId != '' ">
+				and org_id=${orgId}
+			</if>
+			
+			<if test="conditions != null">
+				and 
+				<if test="relation == 'and'">
+					<foreach collection="conditions"  item="item" separator="and">
+						<if test="item.function != 'is null' and item.function !='is not null'">
+								${item.filed} ${item.function} (${item.params})
+						</if>
+						
+						<if test="item.function == 'is null' or item.function =='is not null'">
+							${item.filed} ${item.function}
+						</if>
+					</foreach>
+				</if>
+				<if test="relation == 'or'">
+					(<foreach collection="conditions"  item="item" separator="or">
+						<if test="item.function != 'is null' and item.function !='is not null'">
+								${item.filed} ${item.function} (${item.params})
+						</if>
+						
+						<if test="item.function == 'is null' or item.function =='is not null'">
+							${item.filed} ${item.function}
+						</if>
+					</foreach>)
+				</if>
+			</if>
+			group by unit
+	</select>
+	
+	
+	<select id="distributeAnalysis" resultType="java.util.LinkedHashMap">
+		select 
+			<foreach collection="list" item="item" separator=",">
+				<if test="item.start == 0">
+					max(if(type='${item.start}',cnt,0)) range${item.start}
+				</if>
+				<if test="item.start &gt; 0">
+					max(if(type='${item.start}',cnt,0)) range${item.start}
+				</if>
+			</foreach> from
+		(select 
+			type, (${aggregator}(${field})) cnt
+			from
+				(select ${field},(case 
+					<foreach collection="list" item="item">
+						<if test="item.end != null and item.end != '' ">
+							<![CDATA[
+								when ${rAggregator}(${rField})>=toDecimal32(${item.start},2) and ${rAggregator}(${rField})<toDecimal32(${item.end},2) then '${item.start}'								
+							]]>
+						</if>
+						<if test="item.end == null or item.end ==''">
+							<![CDATA[
+								when ${rAggregator}(${rField})>=toDecimal32(${item.start},2) then '${item.start}'
+							]]>
+						</if>
+					</foreach>
+					else 'type' end) type 
+					from ${project}.em_events_dis 
+					where toDate(time) between '${startDate}' and '${endDate}' and event='${eventName}' 
+					<if test="conditions != null">
+					<if test="orgId != null and orgId != '' ">
+						and org_id=${orgId}
+					</if>
+			 			and _app_id in 
+					<foreach collection="_app_id" item="item" separator="," open="(" close=")">
+						'${item}'
+					</foreach>
+						and 
+					<if test="relation == 'and'">
+						<foreach collection="conditions"  item="item" separator="and">
+							<if test="item.function != 'is null' and item.function !='is not null'">
+									${item.filed} ${item.function} (${item.params})
+							</if>
+							
+							<if test="item.function == 'is null' or item.function =='is not null'">
+								${item.filed} ${item.function}
+							</if>
+						</foreach>
+					</if>
+					<if test="relation == 'or'">
+						(<foreach collection="conditions"  item="item" separator="or">
+							<if test="item.function != 'is null' and item.function !='is not null'">
+									${item.filed} ${item.function} (${item.params})
+							</if>
+							
+							<if test="item.function == 'is null' or item.function =='is not null'">
+								${item.filed} ${item.function}
+							</if>
+						</foreach>)
+					</if>
+					</if>
+					group by ${field})
+					group by type)
+	</select>
+	
+	
+	<!-- <select id="distributeAnalysis" resultType="java.util.LinkedHashMap">
+		select 
+			<foreach collection="list" item="item" separator=",">
+				<if test="item.start == 0">
+					max(if(type='${item.start}',${item.start},0)) range${item.end}
+				</if>
+				<if test="item.start &gt; 0">
+					max(if(type='${item.start}',${item.start},0)) range${item.start}
+				</if>
+			</foreach>
+			from
+				(select 
+					count(org_id) cnt,type from			
+					(select org_id,(case 
+						<foreach collection="list" item="item">
+							<if test="item.end != null and item.end != '' ">
+								<![CDATA[
+									when ${rAggregator}(${rField})>=${item.start} and ${rAggregator}(${rField})<${item.end} then '${item.start}'								
+								]]>
+							</if>
+							<if test="item.end == null or item.end ==''">
+								<![CDATA[
+									when ${rAggregator}(${rField})>=${item.start} then '${item.start}'
+								]]>
+							</if>
+						</foreach>
+						else 'type' end) type 
+						from ${project}.em_events_dis 
+						<if test="conditions != null">
+							where toDate(time) between '${startDate}' and '${endDate}' and event='${eventName}' 
+						<if test="orgId != null and orgId != '' ">
+							and org_id=${orgId}
+						</if>
+				 			and _app_id in 
+						<foreach collection="_app_id" item="item" separator="," open="(" close=")">
+							'${item}'
+						</foreach>
+							and 
+						<if test="relation == 'and'">
+							<foreach collection="conditions"  item="item" separator="and">
+								<if test="item.function != 'is null' and item.function !='is not null'">
+										${item.filed} ${item.function} (${item.params})
+								</if>
+								
+								<if test="item.function == 'is null' or item.function =='is not null'">
+									${item.filed} ${item.function}
+								</if>
+							</foreach>
+						</if>
+						<if test="relation == 'or'">
+							(<foreach collection="conditions"  item="item" separator="or">
+								<if test="item.function != 'is null' and item.function !='is not null'">
+										${item.filed} ${item.function} (${item.params})
+								</if>
+								
+								<if test="item.function == 'is null' or item.function =='is not null'">
+									${item.filed} ${item.function}
+								</if>
+							</foreach>)
+						</if>
+						</if>
+						group by org_id)
+						group by type)
+	</select> -->
+</mapper>

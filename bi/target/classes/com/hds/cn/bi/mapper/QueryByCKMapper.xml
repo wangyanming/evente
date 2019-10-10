@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hds.cn.bi.mapper.QueryByCKMapper">
+	<select id="getTotalDataByDay" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+		select
+			a.pv pv, a.uv uv, b.orderAmount orderAmount, b.orderUser orderUser, b.orderCnt orderCnt, b.productCnt productCnt
+		from
+			(
+			select count(distinct_id) pv, uniq(distinct_id) uv, org_id
+				from evente.em_events_dis
+			where
+				org_id = ${orgId} and toDate(time) between '${startDate}' and '${endDate}'
+				<if test ="productId != null and -1 != productId">
+					and event = 'ViewProduct' and product_id = ${productId} and product_type = '${productType}'
+				</if>
+				<if test ="productId == null or -1 == productId">
+					and event = 'PageView' 
+				</if>
+			group by org_id ) a
+		left join (
+			select sum(product_sub_price + freight_money) orderAmount, uniq(distinct_id) orderUser, uniq(increment_id) orderCnt, sum(product_number) productCnt, org_id
+			from evente.em_events_dis
+			where
+				event = 'PaidOrder' and org_id = ${orgId} 
+				and toDate(time) between '${startDate}' and '${endDate}'
+				<if test ="productId != null and -1 != productId">
+					and product_id = ${productId} and product_type = '${productType}' 
+				</if>
+			group by org_id ) b 
+		on a.org_id = b.org_id
+	</select>
+	
+	<select id="getTotalDataByHour" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+		select
+			a.date date, a.pv pv, a.uv uv, b.orderAmount orderAmount, b.orderUser orderUser, b.orderCnt orderCnt, b.productCnt productCnt
+		from
+			(
+			select 
+				<if test="type == 'hour'">
+					concat(formatDateTime(time,'%F %I'),':00:00') date,
+				</if>
+				<if test="type == 'day'">
+					formatDateTime(time, '%F') date,
+				</if>
+			 	count(distinct_id) pv, uniq(distinct_id) uv
+				from evente.em_events_dis
+			where
+				org_id = ${orgId} and toDate(time) between '${startDate}' and '${endDate}'
+				<if test ="productId != null and -1 != productId">
+					and event = 'ViewProduct' and product_id = ${productId} and product_type = '${productType}' 
+				</if>
+				<if test ="productId == null or -1 == productId">
+					and event = 'PageView' 
+				</if>
+			group by date ) a
+		left join
+			(select 
+				<if test="type == 'hour'">
+					concat(formatDateTime(time,'%F %I'),':00:00') date,
+				</if>
+				<if test="type == 'day'">
+					formatDateTime(time, '%F') date,
+				</if> 
+				sum(product_sub_price + freight_money) orderAmount, uniq(distinct_id) orderUser, uniq(increment_id) orderCnt, sum(product_number) productCnt
+				from evente.em_events_dis
+			where
+				event = 'PaidOrder' and org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}'
+				<if test ="productId != null and -1 != productId">
+					and product_id = ${productId} and product_type = '${productType}' 
+				</if>
+			group by date ) b 
+		on a.date = b.date
+		order by date desc
+	</select>
+	
+	<select id="getDataByChannelId" resultType="java.util.LinkedHashMap">
+		select
+			a.channel_id channel_id, a.uv uv, a.pv pv,
+			ifNull(b.orderAmount, 0) orderAmount,
+			ifNull(b.orderUser, 0)/ a.uv conversionRate,
+			ifNull(b.orderCnt, 0) orderCnt,
+			ifNull(b.productCnt, 0) productCnt
+		from
+			(select channel_id,count(distinct_id) pv, uniq(distinct_id) uv
+				from evente.em_events_dis
+			where
+				org_id = ${orgId} and toDate(time) between '${startDate}' and '${endDate}'
+				<if test ="productId != null and -1 != productId">
+					and event = 'ViewProduct' and product_id = ${productId} and product_type = '${productType}'
+				</if>
+				<if test ="productId == null or -1 == productId">
+					and event = 'PageView' 
+				</if>
+			group by channel_id) a
+		left join (
+			select 
+				channel_id,sum(product_sub_price + freight_money) orderAmount, 
+				uniq(distinct_id) orderUser, uniq(increment_id) orderCnt, sum(product_number) productCnt
+				from evente.em_events_dis
+			where
+				event = 'PaidOrder'
+				and org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				<if test ="productId != null and -1 != productId">
+					and product_id = ${productId} and product_type = '${productType}' 
+				</if>
+			group by channel_id ) b 
+		on a.channel_id = b.channel_id
+		ORDER BY orderAmount DESC
+		<if test="size == -1">
+			limit 5
+		</if>
+	</select>
+	
+	<select id="getDataByDeviceType" resultType="java.util.LinkedHashMap">
+		select
+			a.device_type client_id, a.uv uv, a.pv pv,
+			ifNull(b.orderAmount, 0) orderAmount,
+			ifNull(b.orderUser, 0)/ a.uv conversionRate,
+			ifNull(b.orderCnt, 0) orderCnt,
+			ifNull(b.productCnt, 0) productCnt
+		from
+			(select device_type,count(distinct_id) pv, uniq(distinct_id) uv
+				from evente.em_events_dis
+			where
+				org_id = ${orgId} and toDate(time) between '${startDate}' and '${endDate}'
+				<if test ="productId != null and -1 != productId">
+					and event = 'ViewProduct' and product_id = ${productId} and product_type = '${productType}'
+				</if>
+				<if test ="productId == null or -1 == productId">
+					and event = 'PageView' 
+				</if>
+			group by device_type) a
+		left join (
+			select 
+				device_type,sum(product_sub_price + freight_money) orderAmount, 
+				uniq(distinct_id) orderUser, uniq(increment_id) orderCnt, sum(product_number) productCnt
+				from evente.em_events_dis
+			where
+				event = 'PaidOrder'
+				and org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				<if test ="productId != null and -1 != productId">
+					and product_id = ${productId} and product_type = '${productType}' 
+				</if>
+			group by device_type ) b 
+		on a.device_type = b.device_type
+		ORDER BY orderAmount DESC
+		<if test="size == -1">
+			limit 5
+		</if>
+	</select>
+	
+	<select id="getDataByPayWay" resultType="java.util.LinkedHashMap">
+		select
+			a.pay_way pay_way, b.orderAmount orderAmount, ifNull(b.orderUser,0)/a.orderUser conversionRate, b.orderCnt orderCnt, b.productCnt productCnt
+		from
+			(
+			select pay_way, uniq(distinct_id) orderUser
+				from evente.em_events_dis
+			where
+				event = 'PayOrder' and org_id = ${orgId} 
+				and toDate(time) between '${startDate}' and '${endDate}'
+				<if test ="productId != null and -1 != productId">
+					and product_id = ${productId} and product_type = '${productType}' 
+				</if>
+			group by pay_way) a
+		left join (
+			select pay_way, sum(product_sub_price + freight_money) orderAmount, uniq(distinct_id) orderUser, uniq(increment_id) orderCnt, sum(product_number) productCnt
+				from evente.em_events_dis
+			where
+				event = 'PaidOrder' and org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				<if test ="productId != null and -1 != productId">
+					and product_id = ${productId} and product_type = '${productType}' 
+				</if>
+			group by pay_way ) b 
+		on a.pay_way = b.pay_way
+		order by orderAmount desc
+		<if test="size == -1">
+			limit 5
+		</if>
+	</select>
+	
+	<select id="getDataByRegion" resultType="java.util.LinkedHashMap">
+		select
+			a.region regionId, a.uv uv, a.pv pv,
+			ifNull(b.orderAmount, 0) orderAmount,
+			ifNull(b.orderUser, 0)/ a.uv conversionRate,
+			ifNull(b.orderCnt, 0) orderCnt,
+			ifNull(b.productCnt, 0) productCnt
+		from
+			(select count(distinct_id) pv, uniq(distinct_id) uv, 
+				<if test ="regionType == 1"> 
+					_province region
+				</if> 
+				<if test ="regionType == 2"> 
+					_city region
+				</if> 
+				from evente.em_events_dis
+			where
+				org_id = ${orgId} and toDate(time) between '${startDate}' and '${endDate}'
+				<if test ="productId != null and -1 != productId">
+					and event = 'ViewProduct' and product_id = ${productId} and product_type = '${productType}'
+				</if>
+				<if test ="productId == null or -1 == productId">
+					and event = 'PageView' 
+				</if>
+			group by region) a
+		left join (
+			select 
+				sum(product_sub_price + freight_money) orderAmount, 
+				uniq(distinct_id) orderUser, uniq(increment_id) orderCnt, sum(product_number) productCnt,
+				<if test ="regionType == 1"> 
+					_province region
+				</if> 
+				<if test ="regionType == 2"> 
+					_city region
+				</if> 
+				from evente.em_events_dis
+			where
+				event = 'PaidOrder'
+				and org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				<if test ="productId != null and -1 != productId">
+					and product_id = ${productId} and product_type = '${productType}' 
+				</if>
+			group by region ) b 
+		on a.region = b.region
+	</select>
+	
+	<select id="getBuyRate" resultType="java.util.LinkedHashMap">
+		<if test="size == -1">
+			select
+				viewDetailCnt,
+				confirmOrderCnt,
+				payOrderCnt,
+				successPaylCnt,
+				confirmOrderCnt / if(viewDetailCnt = 0, 1, viewDetailCnt) confirmOrderRate,
+				payOrderCnt / if(confirmOrderCnt = 0, 1, confirmOrderCnt) payOrderRate,
+				successPaylCnt / if(payOrderCnt = 0, 1, payOrderCnt) successOrderRate,
+				successPaylCnt / if(viewDetailCnt = 0, 1, viewDetailCnt) totalRate
+			from
+				(
+				select max(if(event = 'ViewProduct', cnt, 0)) viewDetailCnt,
+					max(if(event = 'MakeOrder', cnt, 0)) confirmOrderCnt,
+					max(if(event = 'PayOrder', cnt, 0)) payOrderCnt,
+					max(if(event = 'PaidOrder', cnt, 0)) successPaylCnt
+				from
+					(
+					select uniq(distinct_id) cnt, event
+						from evente.em_events_dis
+					where
+						event in ('ViewProduct', 'MakeOrder', 'PayOrder', 'PaidOrder')
+						and org_id = ${orgId}
+						and toDate(time) between '${startDate}' and '${endDate}' 
+						<if test ="productId != null and -1 != productId">
+							and product_id = ${productId} and product_type = '${productType}' 
+						</if>
+						and device_type = ${agentType}
+					group by event ))
+		</if>
+		<if test="size == 1">
+			select
+				date,
+				viewDetailCnt,
+				confirmOrderCnt,
+				payOrderCnt,
+				successPaylCnt,
+				confirmOrderCnt / if(viewDetailCnt = 0, 1, viewDetailCnt) confirmOrderRate,
+				payOrderCnt / if(confirmOrderCnt = 0, 1, confirmOrderCnt) payOrderRate,
+				successPaylCnt / if(payOrderCnt = 0, 1, payOrderCnt) successOrderRate,
+				successPaylCnt / if(viewDetailCnt = 0, 1, viewDetailCnt) totalRate
+			from
+				(
+				select max(if(event = 'ViewProduct', cnt, 0)) viewDetailCnt,
+					max(if(event = 'MakeOrder', cnt, 0)) confirmOrderCnt,
+					max(if(event = 'PayOrder', cnt, 0)) payOrderCnt,
+					max(if(event = 'PaidOrder', cnt, 0)) successPaylCnt,
+					date
+				from
+					(
+					select uniq(distinct_id) cnt, event, toDate(time) date
+						from evente.em_events_dis
+					where
+						event in ('ViewProduct', 'MakeOrder', 'PayOrder', 'PaidOrder')
+						and org_id = ${orgId}
+						and toDate(time) between '${startDate}' and '${endDate}' 
+						<if test ="productId != null and -1 != productId">
+							and product_id = ${productId} and product_type = '${productType}' 
+						</if>
+						and device_type = ${agentType}
+					group by event,date )
+				group by date)
+		</if>
+	</select>
+	
+	<select id="getMultiActivity" resultType="java.util.LinkedHashMap">
+		select
+			a.product_id productId,
+			a.pv pv,
+			a.uv uv,
+			b.orderAmount orderAmount,
+			b.orderUser orderUser,
+			b.orderCnt orderCnt,
+			b.productCnt productCnt
+		from
+			(
+			select
+				count(distinct_id) pv,
+				uniq(distinct_id) uv,
+				product_id
+			from
+				evente.em_events_dis
+			where
+				org_id = ${orgId}
+				and event = 'ViewProduct'
+				and product_id in
+				<foreach collection="productIds" item="item" separator="," open="(" close=")">
+					${item}
+				</foreach>
+				and product_type = '${productType}' 
+			group by product_id ) a
+		left join (
+			select
+				sum(product_sub_price + freight_money) orderAmount,
+				uniq(distinct_id) orderUser,
+				uniq(increment_id) orderCnt,
+				sum(product_number) productCnt,
+				product_id
+			from
+				evente.em_events_dis
+			where
+				event = 'PaidOrder'
+				and org_id = ${orgId}
+				and product_id in
+				<foreach collection="productIds" item="item" separator="," open="(" close=")">
+					${item}
+				</foreach>
+				and product_type = '${productType}' 
+			group by product_id ) b 
+		on a.product_id = b.product_id
+	</select>
+	
+	<select id="getMultiTotalData">
+		
+	</select>
+	
+	<select id="getMultiAgentData" resultType="java.util.LinkedHashMap">
+		select
+			a.device_type agentId,
+			a.pv pv,
+			a.uv uv,
+			b.orderAmount orderAmount,
+			b.orderUser orderUser,
+			b.orderCnt orderCnt,
+			b.productCnt productCnt,
+			b.orderUser/a.uv conversionRate
+		from
+			(
+			select
+				count(distinct_id) pv,
+				uniq(distinct_id) uv,
+				device_type
+			from
+				evente.em_events_dis
+			where
+				org_id = ${orgId}
+				and event = 'ViewProduct'
+				and device_type in 
+				<foreach collection ="agentIds" item ="item" separator ="," open ="(" close =")"> 
+					${item} 
+				</foreach>
+				and product_type = '${productType}'
+			group by
+				device_type ) a
+		left join (
+			select
+				sum(product_sub_price + freight_money) orderAmount,
+				uniq(distinct_id) orderUser,
+				uniq(increment_id) orderCnt,
+				sum(product_number) productCnt,
+				device_type
+			from
+				evente.em_events_dis
+			where
+				event = 'PaidOrder'
+				and org_id = ${orgId}
+				and device_type in 
+				<foreach collection ="agentIds" item ="item" separator ="," open ="(" close =")"> 
+					${item} 
+				</foreach>
+				and product_type = '${productType}'
+			group by
+				device_type ) b on
+			a.device_type = b.device_type
+	</select>
+	
+	<!-- 老版分销开始 -->
+	<select id="getMultiAgentRegionData" resultType="java.util.LinkedHashMap">
+		SELECT a.org_id orgId, a.product_type productType, a.agent_id agentId,a._province id,
+			a.uv uv, a.pv pv, b.orderAmount orderAmount, b.productCnt productCnt, b.orderCnt orderCnt, b.orderUser successUser,
+			b.orderUser / a.uv conversionRate FROM
+		(
+			SELECT uniq(distinct_id) uv, count(distinct_id) pv, org_id, _province, product_type, agent_id
+				FROM evente.em_events_dis
+			WHERE 
+				org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				and event = 'ViewProduct'
+				and agent_id = ${agentId}
+				and product_type = ${productType}
+			GROUP BY org_id, _province, product_type, agent_id) a
+		LEFT JOIN
+		(
+			select
+				sum(product_sub_price + freight_money) orderAmount,
+				sum(product_number) productCnt,
+				uniq(increment_id) orderCnt,
+				uniq(distinct_id) orderUser,
+				org_id,  _province, product_type, agent_id
+				from evente.em_events_dis
+			where
+				event = 'PaidOrder'
+				and org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}'
+				and agent_id = ${agentId}
+				and product_type = ${productType}
+			GROUP BY org_id,  _province, product_type, agent_id) b
+		on a._province = b._province
+	</select>
+	
+	<select id="getMultiAgentSaleData" resultType="java.util.LinkedHashMap">
+		select
+			a.org_id orgId,
+			a.product_type productType,
+			a.agent_id agentId,
+			a.date statTime,
+			a.uv uv,
+			a.pv pv,
+			b.orderAmount orderAmount,
+			b.orderCnt orderCnt,
+			b.userCnt successUser,
+			b.userCnt/a.uv conversionRate,
+			b.productNum productCnt,
+			b.product_id productId
+		from
+			(
+				select 
+				<if test="type == 'hour'">
+					concat(formatDateTime(time,'%F %I'),':00:00') date,
+				</if>
+				<if test="type == 'day'">
+					formatDateTime(time, '%F') date,
+				</if>
+				org_id, agent_id, product_type, product_id, uniq(distinct_id) uv, count(distinct_id) pv
+			from
+				evente.em_events_dis
+			where
+				org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				and event = 'ViewProduct'
+				and agent_id = ${agentId}
+				and product_type = ${productType}
+			group by date, org_id, agent_id, product_type,
+				product_id) a
+		left join (
+				select 
+				<if test="type == 'hour'">
+					concat(formatDateTime(time,'%F %I'),':00:00') date,
+				</if>
+				<if test="type == 'day'">
+					formatDateTime(time, '%F') date,
+				</if>
+				org_id, agent_id, product_type, product_id, uniq(increment_id) orderCnt,
+				sum(product_sub_price + freight_money) orderAmount, sum(product_number) productNum, uniq(distinct_id) userCnt
+			from
+				evente.em_events_dis
+			where
+				org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				and event = 'PaidOrder'
+				and agent_id = ${agentId}
+				and product_type = ${productType}
+			group by
+				date, org_id, agent_id, product_type,
+				product_id) b on
+			a.date = b.date
+			and a.org_id = b.org_id
+			and a.agent_id = b.agent_id
+			and a.product_id = b.product_id
+			and a.product_type = b.product_type
+		
+	</select>
+	
+	<select id="getMultiAgentFromData" resultType="java.util.LinkedHashMap">
+		select
+			a.date statTime, a.org_id orgId, a.channel_id Id, a.agent_id agentId, a.product_type productType, a.product_id productId,
+			a.uv uv, a.pv pv, b.orderCnt orderCnt, b.orderAmount orderAmount, b.userCnt successUser, b.userCnt/a.uv conversionRate,
+			b.productNum productCnt
+		from
+			(
+				select 
+				<if test="type == 'hour'">
+					concat(formatDateTime(time,'%F %I'),':00:00') date,
+				</if>
+				<if test="type == 'day'">
+					formatDateTime(time, '%F') date,
+				</if>
+				org_id, agent_id, product_type, product_id, channel_id, uniq(distinct_id) uv, count(distinct_id) pv
+			from
+				evente.em_events_dis
+			where
+				org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				and event = 'ViewProduct'
+				and agent_id = ${agentId}
+				and product_type = ${productType}
+			group by
+				date, org_id, agent_id, product_type, product_id,
+				channel_id) a
+		left join (
+				select 
+				<if test="type == 'hour'">
+					concat(formatDateTime(time,'%F %I'),':00:00') date,
+				</if>
+				<if test="type == 'day'">
+					formatDateTime(time, '%F') date,
+				</if>
+				org_id, agent_id, product_type, product_id, channel_id, uniq(increment_id) orderCnt, sum(pay_money) orderAmount, 
+				sum(product_number) productNum, uniq(distinct_id) userCnt
+			from
+				evente.em_events_dis
+			where
+				org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				and event = 'PaidOrder'
+				and agent_id = ${agentId}
+				and product_type = ${productType}
+			group by
+				date, org_id, agent_id, product_type, product_id,
+				channel_id) b on
+			a.date = b.date
+			and a.product_id = b.product_id
+			and a.channel_id = b.channel_id
+	</select>
+	
+	<select id="getMultiAgentClientData" resultType="java.util.LinkedHashMap">
+		select
+			a.date statTime, a.org_id orgId, a.device_type Id, a.agent_id agentId, a.product_type productType, a.product_id productId,
+			a.uv uv, a.pv pv, b.orderCnt orderCnt, b.orderAmount orderAmount, b.userCnt successUser, b.userCnt/a.uv conversionRate,
+			b.productNum productCnt
+		from
+			(
+				select 
+				<if test="type == 'hour'">
+					concat(formatDateTime(time,'%F %I'),':00:00') date,
+				</if>
+				<if test="type == 'day'">
+					formatDateTime(time, '%F') date,
+				</if>
+				org_id, agent_id, product_type, product_id, device_type, uniq(distinct_id) uv, count(distinct_id) pv
+			from
+				evente.em_events_dis
+			where
+				org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				and event = 'ViewProduct'
+				and agent_id = ${agentId}
+				and product_type = ${productType}
+			group by
+				date, org_id, agent_id, product_type, product_id,
+				device_type) a
+		left join (
+				select 
+				<if test="type == 'hour'">
+					concat(formatDateTime(time,'%F %I'),':00:00') date,
+				</if>
+				<if test="type == 'day'">
+					formatDateTime(time, '%F') date,
+				</if>
+				org_id, agent_id, product_type, product_id, device_type, uniq(increment_id) orderCnt, sum(pay_money) orderAmount, 
+				sum(product_number) productNum, uniq(distinct_id) userCnt
+			from
+				evente.em_events_dis
+			where
+				org_id = ${orgId}
+				and toDate(time) between '${startDate}' and '${endDate}' 
+				and event = 'PaidOrder'
+				and agent_id = ${agentId}
+				and product_type = ${productType}
+			group by
+				date, org_id, agent_id, product_type, product_id,
+				device_type) b on
+			a.date = b.date
+			and a.product_id = b.product_id
+			and a.device_type = b.device_type
+	</select>
+	<!-- 老版分销结束 -->
+	
+	<select id="getMultiProductData" resultType="java.util.LinkedHashMap">
+		select
+			sum(product_sub_price + freight_money) orderAmount,
+			uniq(distinct_id) orderUser,
+			uniq(increment_id) orderCnt,
+			sum(product_number) productCnt,
+			product_id productId, product_type productType, org_id orgId, device_type agentId, product_rel_id productRelId, product_sub_id productSubId
+		from
+			evente.em_events_dis
+		where
+			event = 'PaidOrder'
+			and org_id = ${orgId}
+			and toDate(time) between '${startDate}' and '${endDate}'
+			and device_type = ${agentId}
+		group by product_id, product_type, org_id, device_type, product_rel_id, product_sub_id		
+	</select>
+	
+	<select id="getMultiProductDataByProductId" resultType="java.util.LinkedHashMap">
+		select
+			a.product_id productId,
+			a.pv pv,
+			a.uv uv,
+			b.orderAmount orderAmount,
+			b.orderUser userCnt,
+			b.orderCnt orderCnt,
+			b.productCnt productCnt
+		from
+			(
+			select
+				count(distinct_id) pv,
+				uniq(distinct_id) uv,
+				product_id
+			from
+				evente.em_events_dis
+			where
+				event = 'ViewProduct'
+				and product_id in
+				<foreach collection="productIds" item="item" separator="," open="(" close=")">
+					${item}
+				</foreach>
+				and product_type = '${productType}' 
+			group by product_id ) a
+		left join (
+			select
+				sum(product_sub_price + freight_money) orderAmount,
+				uniq(distinct_id) orderUser,
+				uniq(increment_id) orderCnt,
+				sum(product_number) productCnt,
+				product_id
+			from
+				evente.em_events_dis
+			where
+				event = 'PaidOrder'
+				and product_id in
+				<foreach collection="productIds" item="item" separator="," open="(" close=")">
+					${item}
+				</foreach>
+				and product_type = '${productType}' 
+			group by product_id ) b 
+		on a.product_id = b.product_id
+	</select>
+</mapper>
