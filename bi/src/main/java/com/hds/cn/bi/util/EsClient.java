@@ -12,11 +12,11 @@ import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan
 public class EsClient {
-	private static final String HOST = "192.168.1.201";
+	//private static final String HOST = "192.168.1.201";
 	//private static final String HOST = "192.168.0.29";
-	//private static final String HOST = "39.107.79.26";
-	private static final String CLUSTERNAME = "evente-elasticsearch";
-	//private static final String CLUSTERNAME = "bi-es";
+	private static final String HOST = "39.107.79.26";
+	//private static final String CLUSTERNAME = "evente-elasticsearch";
+	private static final String CLUSTERNAME = "bi-es";
 	private static final int PORT = 9300;
 	private static volatile TransportClient client;
 	private static final Settings settings = Settings.builder()

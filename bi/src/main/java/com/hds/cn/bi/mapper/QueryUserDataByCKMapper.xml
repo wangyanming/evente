@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hds.cn.bi.mapper.QueryUserDataByCKMapper">
+    <select id="getTotalData" resultType="java.util.HashMap" parameterType="java.util.Map">
+        select
+        a.payCnt payCnt, b.registCnt registCnt
+        from
+        (
+        select uniq(distinct_id) payCnt, org_id
+        from evente.em_events_dis
+        where
+        org_id = ${orgId} and toDate(time) between '${startDate}' and '${endDate}'
+        and event = 'PaidOrder'
+        <if test ="productId != null and -1 != productId">
+            and product_id = ${productId} and product_type = '${productType}'
+        </if>
+        group by org_id ) a
+        left join (
+        select uniq(distinct_id) registCnt, org_id
+        from evente.em_events_dis
+        where
+        event = 'SignUp' and org_id = ${orgId}
+        and toDate(time) between '${startDate}' and '${endDate}'
+        <if test ="productId != null and -1 != productId">
+            and product_id = ${productId} and product_type = '${productType}'
+        </if>
+        group by org_id ) b
+        on a.org_id = b.org_id
+    </select>
+
+    <select id="getRegistFrom" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+        select
+            a.payCnt payCnt, b.registCnt registCnt
+            from
+                (
+                select uniq(distinct_id) payCnt
+                    <if test="type == 'hour'">
+                        concat(formatDateTime(time,'%F %I'),':00:00') date,
+                    </if>
+                    <if test="type == 'day'">
+                        formatDateTime(time, '%F') date,
+                    </if>
+                    from evente.em_events_dis
+                    where
+                    org_id = ${orgId} and toDate(time) between '${startDate}' and '${endDate}'
+                    and event = 'PaidOrder'
+                    <if test ="productId != null and -1 != productId">
+                        and product_id = ${productId} and product_type = '${productType}'
+                    </if>
+                group by date ) a
+        left join (
+                select
+                    (
+                    <if test="type == 'hour'">
+                        concat(formatDateTime(time,'%F %I'),':00:00') date,
+                    </if>
+                    <if test="type == 'day'">
+                        formatDateTime(time, '%F') date,
+                    </if>
+                    uniq(distinct_id) registCnt
+                    from evente.em_events_dis
+                    where
+                    event = 'SignUp' and org_id = ${orgId}
+                    and toDate(time) between '${startDate}' and '${endDate}'
+                    <if test ="productId != null and -1 != productId">
+                        and product_id = ${productId} and product_type = '${productType}'
+                    </if>
+                group by date ) b
+        on a.date = b.date
+    </select>
+
+    <select id="getRegistChannel" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+        select uniq(distinct_id) registCnt, channel_id
+        from evente.em_events_dis
+        where
+        event = 'SignUp' and org_id = ${orgId}
+        and toDate(time) between '${startDate}' and '${endDate}'
+        <if test ="productId != null and -1 != productId">
+            and product_id = ${productId} and product_type = '${productType}'
+        </if>
+        group by channel_id
+        order by registCnt desc
+        <if test="-1 == size">
+            limit 5
+        </if>
+    </select>
+
+    <select id="getRegistRegion" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+        select uniq(distinct_id) registCnt,
+        <if test="-1 == regionType">
+            _province region
+        </if>
+        <if test="1 == regionType">
+            _city region
+        </if>
+        from evente.em_events_dis
+        where
+        event = 'SignUp' and org_id = ${orgId} and freight_money = 0
+        and toDate(time) between '${startDate}' and '${endDate}'
+        <if test ="productId != null and -1 != productId">
+            and product_id = ${productId} and product_type = '${productType}'
+        </if>
+        group by region
+        order by registCnt desc
+        <if test="-1 == size">
+            limit 5
+        </if>
+    </select>
+
+    <select id="getPayFrom" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+        select uniq(distinct_id) registCnt, pay_way
+        from evente.em_events_dis
+        where
+        event = 'PaidOrder' and org_id = ${orgId} and freight_money = 0
+        and toDate(time) between '${startDate}' and '${endDate}'
+        <if test ="productId != null and -1 != productId">
+            and product_id = ${productId} and product_type = '${productType}'
+        </if>
+        group by pay_way
+        order by registCnt desc
+        <if test="-1 == size">
+            limit 5
+        </if>
+    </select>
+
+    <select id="getClientFrom" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+        select uniq(distinct_id) registCnt, device_type
+        from evente.em_events_dis
+        where
+        event = 'PaidOrder' and org_id = ${orgId}
+        and toDate(time) between '${startDate}' and '${endDate}'
+        <if test ="productId != null and -1 != productId">
+            and product_id = ${productId} and product_type = '${productType}'
+        </if>
+        group by device_type
+        order by registCnt desc
+        <if test="-1 == size">
+            limit 5
+        </if>
+    </select>
+
+    <select id="getConsumeCnt" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+        select type, count(type) cnt from
+            (select (case when consumeCnt &lt; 3 then 'type1'
+                when consumeCnt &gt;= 3 and consumeCnt &lt; 6 then 'type2'
+                when consumeCnt &gt;= 6 and consumeCnt &lt; 11 then 'type3'
+                when consumeCnt &gt;= 11 and consumeCnt &lt; 31 then 'type4'
+                when consumeCnt &gt;= 31 then 'type5'
+                else 'type' end) type from
+                (select distinct_id, count(distinct_id) consumeCnt
+                from evente.em_events_dis
+                where
+                event = 'PaidOrder' and org_id = ${orgId}
+                and toDate(time) between '${startDate}' and '${endDate}' and freight_money = 0
+                <if test ="productId != null and -1 != productId">
+                    and product_id = ${productId} and product_type = '${productType}'
+                </if>
+                group by distinct_id) a) b
+        group by type order by type desc
+    </select>
+
+    <select id="getConsumeAmount" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+        select type, count(type) cnt from
+        (select (case when consumeMoney &lt; 1001 then 'type1'
+        when consumeMoney &gt;= 1001 and consumeMoney &lt; 2001 then 'type2'
+        when consumeMoney &gt;= 2001 and consumeMoney &lt; 3001 then 'type3'
+        when consumeMoney &gt;= 3001 and consumeMoney &lt; 5001 then 'type4'
+        when consumeMoney &gt;= 5001 then 'type5'
+        else 'type' end) type from
+        (select distinct_id, sum(freight_money + product_sub_price) consumeMoney
+        from evente.em_events_dis
+        where
+        event = 'PaidOrder' and org_id = ${orgId}
+        and toDate(time) between '${startDate}' and '${endDate}' and freight_money = 0
+        <if test ="productId != null and -1 != productId">
+            and product_id = ${productId} and product_type = '${productType}'
+        </if>
+        group by distinct_id) a) b
+        group by type order by type desc
+    </select>
+
+    <select id="getLogonCnt" resultType="java.util.HashMap" parameterType="java.util.Map">
+        select a.logonCnt logonCnt,
+            b.sleepCnt sleepCnt from
+            (select uniq(distinct_id) logonCnt
+                from evente.em_events_dis
+                where
+                event = 'PaidOrder' and org_id = ${orgId}
+                and toDate(time) between '${startDate}' and '${endDate}'
+                <if test ="productId != null and -1 != productId">
+                    and product_id = ${productId} and product_type = '${productType}'
+                </if>
+            group by distinct_id) a
+            left join
+            (select uniq(x.distinct_id) sleepCnt from
+                (select distinct distinct_id
+                    from evente.em_events_dis
+                    where
+                    event = 'PaidOrder' and org_id = ${orgId}
+                    and toDate(time) &lt; '${startDate}'
+
+                    <if test ="productId != null and -1 != productId">
+                        and product_id = ${productId} and product_type = '${productType}'
+                    </if>
+                    group by distinct_id) x
+            left join
+                (select distinct distinct_id
+                    from evente.em_events_dis
+                    where
+                    event = 'PaidOrder' and org_id = ${orgId}
+                    and toDate(time) between '${startDate}' and '${endDate}'
+                    <if test ="productId != null and -1 != productId">
+                        and product_id = ${productId} and product_type = '${productType}'
+                    </if>
+                group by distinct_id) y
+            on x.distinct_id=y.distinct_id
+            where y.distinct_id is null) b
+            on 1=1
+    </select>
+
+    <select id="getGenderCnt" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+        select uniq(distinct_id) registCnt, sex
+            from evente.em_events_dis
+            where
+            event = 'SignUp' and org_id = ${orgId}
+            and toDate(time) between '${startDate}' and '${endDate}'
+            <if test ="productId != null and -1 != productId">
+                and product_id = ${productId} and product_type = '${productType}'
+            </if>
+        group by sex
+        order by registCnt desc
+    </select>
+
+    <select id="getAgeCnt" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+        select type, count(type) cnt from
+            (select (case when age &lt; 20 then 'type1'
+            when age &gt;= 20 and age &lt; 26 then 'type2'
+            when age &gt;= 26 and age &lt; 31 then 'type3'
+            when age &gt;= 31 and age &lt; 41 then 'type4'
+            when age &gt;= 41 then 'type5'
+            else 'type' end) type from
+            (select distinct distinct_id, dateDiff('year',toDate(birthday),today()) age
+            from evente.em_users_dis
+            where
+            event = 'SignUp' and org_id = ${orgId} and birthday!=''
+            and toDate(time) between '${startDate}' and '${endDate}' and freight_money = 0
+            <if test ="productId != null and -1 != productId">
+                and product_id = ${productId} and product_type = '${productType}'
+            </if>) a) b
+        group by type order by type desc
+    </select>
+</mapper>
