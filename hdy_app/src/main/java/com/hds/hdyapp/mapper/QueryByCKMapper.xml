@@ -7,7 +7,7 @@
 		from
 			(
 			select count(distinct_id) pv, uniq(distinct_id) uv, org_id
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				org_id = ${orgId} and toDate(time) between '${startDate}' and '${endDate}'
 				<if test ="productId != null and -1 != productId">
@@ -19,7 +19,7 @@
 			group by org_id ) a
 		left join (
 			select sum(product_sub_price + freight_money) orderAmount, uniq(distinct_id) orderUser, uniq(increment_id) orderCnt, sum(product_number) productCnt, org_id
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder' and org_id = ${orgId} 
 				and toDate(time) between '${startDate}' and '${endDate}'
@@ -33,7 +33,7 @@
 				(select
 					org_id,product_type,SUM(product_number) cnt
 				from
-					evente.em_events
+					evente.em_events_dis
 				where
 					event = 'PaidOrder' and org_id = ${orgId} 
 					and toDate(time) between '${startDate}' and '${endDate}'
@@ -67,7 +67,7 @@
 					concat(formatDateTime(time,'%Y'), '年') date,
 				</if>
 				count(distinct_id) pv, uniq(distinct_id) uv
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				org_id = ${orgId} and event = 'PageView'
 				and toDate(time) between '${startDate}' and '${endDate}'
@@ -75,19 +75,19 @@
 		left join (
 			select 
 				<if test="searchType == 'day'">
-					concat(formatDateTime(time, '%F'), ' 00:00:00') date,
+					formatDateTime(time, '%Y/%m/%d') date,
 				</if>
 				<if test="searchType == 'week'">
-					concat(formatDateTime(toMonday(time), '%F'), ' 00:00:00') date,
+					concat(formatDateTime(time,'%Y'),'年第',toString(toISOWeek(time)),'周') date,
 				</if>
 				<if test="searchType == 'month'">
-					concat(formatDateTime(time,'%Y-%m'), '-01 00:00:00') date,
+					concat(formatDateTime(time,'%Y'),'年',formatDateTime(time,'%m'),'月') date,
 				</if>
 				<if test="searchType == 'year'">
-					concat(formatDateTime(time,'%Y'), '-01-01 00:00:00') date,
+					concat(formatDateTime(time,'%Y'), '年') date,
 				</if>
 				sum(product_sub_price + freight_money) orderAmount, uniq(distinct_id) orderUser, uniq(increment_id) orderCnt, sum(product_number) productCnt
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder' and org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}'
@@ -103,7 +103,7 @@
 				sum(product_sub_price + freight_money) orderAmount,
 				sum(product_number) productCnt
 			from
-				evente.em_events
+				evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -112,7 +112,7 @@
 			group by product_id) a
 		left join
 			(select uniq(distinct_id) uv, product_id
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				org_id = ${orgId} and toDate(time) between '${startDate}' and '${endDate}'
 				and event = 'ViewProduct' 
@@ -133,13 +133,13 @@
 	<select id="getChannelDataByDay" resultType="java.util.LinkedHashMap">
 		SELECT c.channel_id channel_id, c.uv uv, d.orderAmount orderAmount, d.productCnt productCnt, d.orderCnt orderCnt, d.orderUser orderUser,
 			c.uv / if(a.uv=0,1,a.uv) uvRate,
-			d.orderAmount / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
+			toDecimal128(d.orderAmount,17) / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
 			d.productCnt / if(b.productCnt=0,1,b.productCnt) productCntRate,
 			d.orderCnt / if(b.orderCnt=0,1,b.orderCnt) orderCntRate,
 			d.orderUser / if(b.orderUser=0,1,b.orderUser) orderUserRate FROM
 		(
 			SELECT uniq(distinct_id) uv, org_id
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}' 
@@ -153,7 +153,7 @@
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser,
 				org_id
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -163,7 +163,7 @@
 		LEFT JOIN
 		(
 			SELECT channel_id, org_id, uniq(distinct_id) uv 
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}'
@@ -177,7 +177,6 @@
 				<if test="null != channelId">
 					and channel_id = '${channelId}'
 				</if>
-				and channel_id != ''
 			GROUP BY channel_id,org_id) c
 		on a.org_id = c.org_id
 		LEFT JOIN
@@ -188,7 +187,7 @@
 				sum(product_number) productCnt,
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -199,7 +198,6 @@
 				<if test="null != channelId">
 					and channel_id = '${channelId}'
 				</if>
-				and channel_id != ''
 			GROUP BY channel_id,org_id) d
 		on c.channel_id=d.channel_id
 	</select>
@@ -207,13 +205,13 @@
 	<select id="getDeviceDataByDay" resultType="java.util.LinkedHashMap">
 		SELECT c.device_type client_id, c.uv uv, d.orderAmount orderAmount, d.productCnt productCnt, d.orderCnt orderCnt, d.orderUser orderUser,
 			c.uv / if(a.uv=0,1,a.uv) uvRate,
-			d.orderAmount / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
+			toDecimal128(d.orderAmount,17) / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
 			d.productCnt / if(b.productCnt=0,1,b.productCnt) productCntRate,
 			d.orderCnt / if(b.orderCnt=0,1,b.orderCnt) orderCntRate,
 			d.orderUser / if(b.orderUser=0,1,b.orderUser) orderUserRate FROM
 		(
 			SELECT uniq(distinct_id) uv, org_id
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and	event = 'PageView'
@@ -227,7 +225,7 @@
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser,
 				org_id
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -237,7 +235,7 @@
 		LEFT JOIN
 		(
 			SELECT device_type, org_id, uniq(distinct_id) uv 
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}'
@@ -251,7 +249,6 @@
 				<if test="null != deviceType">
 					and device_type = ${deviceType}
 				</if>
-				and device_type != 0
 			GROUP BY device_type,org_id) c
 		on a.org_id = c.org_id
 		LEFT JOIN
@@ -262,7 +259,7 @@
 				sum(product_number) productCnt,
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -273,7 +270,6 @@
 				<if test="null != deviceType">
 					and device_type = ${deviceType}
 				</if>
-				and device_type != 0
 			GROUP BY device_type,org_id) d
 		on c.device_type=d.device_type
 	</select>
@@ -281,13 +277,13 @@
 	<select id="getRegionDataByDay" resultType="java.util.LinkedHashMap">
 		SELECT c._province regionId, c.uv uv, d.orderAmount orderAmount, d.productCnt productCnt, d.orderCnt orderCnt, d.orderUser orderUser,
 			c.uv / if(a.uv=0,1,a.uv) uvRate,
-			d.orderAmount / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
+			toDecimal128(d.orderAmount,17) / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
 			d.productCnt / if(b.productCnt=0,1,b.productCnt) productCntRate,
 			d.orderCnt / if(b.orderCnt=0,1,b.orderCnt) orderCntRate,
 			d.orderUser / if(b.orderUser=0,1,b.orderUser) orderUserRate FROM
 		(
 			SELECT uniq(distinct_id) uv, org_id
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}' 
@@ -306,7 +302,7 @@
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser,
 				org_id
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -319,7 +315,7 @@
 		LEFT JOIN
 		(
 			SELECT _province, org_id, uniq(distinct_id) uv 
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}'
@@ -344,7 +340,7 @@
 				sum(product_number) productCnt,
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -362,7 +358,7 @@
 	
 	<select id="getPayWayDataByDay" resultType="java.util.LinkedHashMap">
 		SELECT b.pay_way pay_way, b.orderAmount orderAmount, b.productCnt productCnt, b.orderCnt orderCnt, b.orderUser orderUser,
-			b.orderAmount / (case WHEN a.orderAmount=0 then 1 else a.orderAmount end) orderAmountRate,
+			toDecimal128(b.orderAmount,17) / (case WHEN a.orderAmount=0 then 1 else a.orderAmount end) orderAmountRate,
 			b.productCnt / if(a.productCnt=0,1,a.productCnt) productCntRate,
 			b.orderCnt / if(a.orderCnt=0,1,a.orderCnt) orderCntRate,
 			b.orderUser / if(a.orderUser=0,1,a.orderUser) orderUserRate FROM
@@ -373,7 +369,7 @@
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser,
 				org_id
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -386,12 +382,11 @@
 				sum(product_number) productCnt,
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser
-			from evente.em_events
+			from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}'
-				and pay_way != ''
 			GROUP BY pay_way,org_id) b
 		on a.org_id = b.org_id
 	</select>
@@ -399,13 +394,13 @@
 	<select id="getDataByChannelId" resultType="java.util.LinkedHashMap">
 		SELECT c.product_id productId, c.uv uv, d.orderAmount orderAmount, d.productCnt productCnt, d.orderCnt orderCnt, d.orderUser orderUser,
 			c.uv / if(a.uv=0,1,a.uv) uvRate,
-			d.orderAmount / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
+			toDecimal128(d.orderAmount,17) / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
 			d.productCnt / if(b.productCnt=0,1,b.productCnt) productCntRate,
 			d.orderCnt / if(b.orderCnt=0,1,b.orderCnt) orderCntRate,
 			d.orderUser / if(b.orderUser=0,1,b.orderUser) orderUserRate FROM
 		(
 			SELECT org_id, product_id, uniq(distinct_id) uv 
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}' and channel_id = '${channelId}'
@@ -420,7 +415,7 @@
 				sum(product_number) productCnt,
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -431,7 +426,7 @@
 		LEFT JOIN
 		(
 			SELECT uniq(distinct_id) uv, org_id
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}' 
@@ -446,7 +441,7 @@
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser,
 				org_id
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -459,13 +454,13 @@
 	<select id="getDataByRegionId" resultType="java.util.LinkedHashMap">
 		SELECT c.product_id productId, c.uv uv, d.orderAmount orderAmount, d.productCnt productCnt, d.orderCnt orderCnt, d.orderUser orderUser,
 			c.uv / if(a.uv=0,1,a.uv) uvRate,
-			d.orderAmount / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
+			toDecimal128(d.orderAmount,17) / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
 			d.productCnt / if(b.productCnt=0,1,b.productCnt) productCntRate,
 			d.orderCnt / if(b.orderCnt=0,1,b.orderCnt) orderCntRate,
 			d.orderUser / if(b.orderUser=0,1,b.orderUser) orderUserRate FROM
 		(
 			SELECT org_id, product_id, uniq(distinct_id) uv 
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}' and _province = '${regionId}'
@@ -480,7 +475,7 @@
 				sum(product_number) productCnt,
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -491,7 +486,7 @@
 		LEFT JOIN	
 		(
 			SELECT uniq(distinct_id) uv, org_id
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}' 
@@ -506,7 +501,7 @@
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser,
 				org_id
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -519,13 +514,13 @@
 	<select id="getDataByDeviceType" resultType="java.util.LinkedHashMap">
 		SELECT c.product_id productId, c.uv uv, d.orderAmount orderAmount, d.productCnt productCnt, d.orderCnt orderCnt, d.orderUser orderUser,
 			c.uv / if(a.uv=0,1,a.uv) uvRate,
-			d.orderAmount / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
+			toDecimal128(d.orderAmount,17) / (case WHEN b.orderAmount=0 then 1 else b.orderAmount end) orderAmountRate,
 			d.productCnt / if(b.productCnt=0,1,b.productCnt) productCntRate,
 			d.orderCnt / if(b.orderCnt=0,1,b.orderCnt) orderCntRate,
 			d.orderUser / if(b.orderUser=0,1,b.orderUser) orderUserRate FROM
 		(
 			SELECT org_id, product_id, uniq(distinct_id) uv 
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}' and device_type = ${clientId}
@@ -540,7 +535,7 @@
 				sum(product_number) productCnt,
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
@@ -551,7 +546,7 @@
 		LEFT JOIN
 		(
 			SELECT uniq(distinct_id) uv, org_id
-				FROM evente.em_events
+				FROM evente.em_events_dis
 			WHERE 
 				org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}' 
@@ -566,7 +561,7 @@
 				uniq(increment_id) orderCnt,
 				uniq(distinct_id) orderUser,
 				org_id
-				from evente.em_events
+				from evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}

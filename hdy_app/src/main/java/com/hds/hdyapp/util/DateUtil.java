@@ -190,8 +190,9 @@ public class DateUtil {
 
 		if (monthNow <= monthBirth) {
 			if (monthNow == monthBirth) {
-				if (dayOfMonthNow < dayOfMonthBirth)
+				if (dayOfMonthNow < dayOfMonthBirth) {
 					age--;
+				}
 			} else {
 				age--;
 			}
@@ -253,6 +254,23 @@ public class DateUtil {
 		return sdf.format(cal.getTime());
 	}
 
+	public static String endWeek(String str) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar cal = Calendar.getInstance();
+		try {
+			cal.setTime(sdf.parse(str));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		int day = cal.get(Calendar.DAY_OF_WEEK);
+		int dayWeek = cal.get(Calendar.DAY_OF_WEEK);
+		if (1 != dayWeek) {
+			cal.add(Calendar.DATE, 8 - day);
+			str = sdf.format(cal.getTime());
+		}
+		return str;
+	}
+
 	public static String getMonth(String str) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
 		SimpleDateFormat df = new SimpleDateFormat("yyyy" + "年" + "MM" + "月");
@@ -266,15 +284,28 @@ public class DateUtil {
 	}
 
 	public static String startMonth(String str) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM" + "-01");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Calendar cal = Calendar.getInstance();
 		try {
 			cal.setTime(sdf.parse(str));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		return df.format(cal.getTime());
+		cal.set(Calendar.DAY_OF_MONTH, cal.getMinimum(Calendar.DAY_OF_MONTH));
+		return str;
+	}
+
+	public static String endMonth(String str) {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			cal.setTime(sdf.parse(str));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		str = sdf.format(cal.getTime());
+		return str;
 	}
 
 	public static String startYear(String str) {
@@ -290,15 +321,31 @@ public class DateUtil {
 	}
 
 	public static String endYear(String str) {
-		Date now = new Date();
-		Calendar c = Calendar.getInstance();
-		c.setTime(now);
+		Date currentDate = new Date();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		c.set(Calendar.DAY_OF_YEAR, 1);
-		c.setTime(c.getTime());
-		c.add(Calendar.DAY_OF_YEAR, -1);
-		String endDate = df.format(c.getTime());
-		return endDate;
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(currentDate);
+		int currentYear = cal.get(Calendar.YEAR);
+		int year = 0;
+		try {
+			year = Integer.parseInt(new SimpleDateFormat("yyyy").format(new SimpleDateFormat("yyyy").parse(str)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if (currentYear != year) {
+			try {
+				cal.setTime(df.parse(str));
+				cal.set(Calendar.MONTH, 11);
+				cal.set(Calendar.DATE, 31);
+				str = df.format(cal.getTime());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			str = DateUtil.dateStampToDay(System.currentTimeMillis());
+		}
+		return str;
 	}
 
 	public static String getYearByStr(String str) {

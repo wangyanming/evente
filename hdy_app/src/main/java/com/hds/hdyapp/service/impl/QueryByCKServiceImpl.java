@@ -1,10 +1,9 @@
 package com.hds.hdyapp.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
+import com.hds.hdyapp.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,7 @@ import com.hds.hdyapp.service.QueryByCKService;
 
 @Service
 public class QueryByCKServiceImpl implements QueryByCKService{
-	
+
 	@Autowired
 	private QueryByCKMapper queryByCKMapper;
 	
@@ -31,7 +30,32 @@ public class QueryByCKServiceImpl implements QueryByCKService{
 
 	@Override
 	public List<Map<String, Object>> getTotalDataByDay(Map<String, Object> req) {
-		return queryByCKMapper.getTotalDataByDay(req);
+		Calendar cal = null;
+		String searchType = req.get("searchType").toString();
+		String startDate = req.get("startDate").toString();
+		String endDate = req.get("endDate").toString();
+		switch (searchType) {
+			case "week":
+				startDate = DateUtil.startWeek(startDate);
+				endDate = DateUtil.endWeek(endDate);
+				req.put("startDate", startDate);
+				req.put("endDate", endDate);
+				return queryByCKMapper.getTotalDataByDay(req);
+			case "month":
+				startDate = DateUtil.startMonth(startDate);
+				endDate = DateUtil.endMonth(endDate);
+				req.put("startDate", startDate);
+				req.put("endDate", endDate);
+				return queryByCKMapper.getTotalDataByDay(req);
+			case "year":
+				startDate = DateUtil.startYear(startDate);
+				endDate = DateUtil.endYear(endDate);
+				req.put("startDate", startDate);
+				req.put("endDate", endDate);
+				return queryByCKMapper.getTotalDataByDay(req);
+			default:
+				return queryByCKMapper.getTotalDataByDay(req);
+		}
 	}
 
 	@Override
