@@ -28,6 +28,9 @@ import com.hdsbi.util.RedisUtils;
 import com.hdsbi.util.ResponseUtil;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
+/**
+ * @author admin
+ */
 @RestController
 @RequestMapping("queryByCK")
 public class QueryByCkController extends BaseController {
