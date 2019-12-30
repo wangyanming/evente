@@ -1,7 +1,6 @@
 package com.hds.cn.bi.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,7 @@ import net.sf.json.JSONObject;
 @Controller
 @RequestMapping("queryByCK")
 public class QueryByCKController extends BaseController {
-	Logger logger = LoggerFactory.getLogger(this.getClass());
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	private String mseg = "";
 	@Autowired
 	private QueryByCKService queryByCKService;
@@ -33,13 +32,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getTotalbyDay", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<Map<String, Object>> getTotalbyDay(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		Map<String, Object> rsMap = new HashMap<String, Object>();
+		Map<String, Object> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getTotalDataByDay(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -52,13 +50,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getTotalbyHour", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getTotalbyHour(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getTotalDataByHour(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -72,13 +69,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getVisitorFrom", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getVisitorFrom(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getDataByChannelId(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -92,13 +88,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getClientFrom", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getClientFrom(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getDataByDeviceType(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -111,13 +106,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getPayFrom", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getPayFrom(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getDataByPayWay(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -130,13 +124,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getRegionDistribution", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getRegionDistribution(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getDataByRegion(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -149,13 +142,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getBuyRate", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getBuyRate(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getBuyRate(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -168,13 +160,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getMultiActivity", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getMultiActivity(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getMultiActivity(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -185,15 +176,14 @@ public class QueryByCKController extends BaseController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getMultiTotalData", method = {RequestMethod.POST, RequestMethod.GET})
-	public ResponseUtil<List<Map<String, Object>>> getMultiTotalData(@RequestBody String info) {
+	public ResponseUtil<Map<String, Object>> getMultiTotalData(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		Map<String, Object> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getMultiTotalData(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -206,13 +196,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getMultiProductData", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getMultiProductData(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getMultiProductData(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -225,13 +214,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getMultiProductDataByProductId", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getMultiProductDataByProductId(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getMultiProductDataByProductId(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -244,13 +232,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getMultiAgentData", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getMultiAgentData(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getMultiAgentData(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -263,13 +250,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getMultiAgentRegionData", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getMultiAgentRegionData(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getMultiAgentRegionData(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -282,13 +268,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getMultiAgentSaleData", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getMultiAgentSaleData(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getMultiAgentSaleData(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -301,13 +286,12 @@ public class QueryByCKController extends BaseController {
 	@RequestMapping(value = "getMultiAgentFromData", method = {RequestMethod.POST, RequestMethod.GET})
 	public ResponseUtil<List<Map<String, Object>>> getMultiAgentFromData(@RequestBody String info) {
 		logger.info("parameters:" + info);
-		List<Map<String, Object>> rsMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> rsMap;
 		try {
 			JSONObject jsonObject = JSONObject.fromObject(info);
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getMultiAgentFromData(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";
@@ -326,7 +310,6 @@ public class QueryByCKController extends BaseController {
 			Map<String, Object> requestMap = RequestUtil.ckResUtil(jsonObject);
 			rsMap = queryByCKService.getMultiAgentClientData(requestMap);
 			mseg = "success";
-			requestMap = null;
 		} catch (Exception e) {
 			logger.error(e.toString());
 			mseg = "请求失败!!!";

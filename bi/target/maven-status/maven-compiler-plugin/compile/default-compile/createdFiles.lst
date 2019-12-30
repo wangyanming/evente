@@ -7,11 +7,13 @@ com\hds\cn\bi\vo\OrgRankVo.class
 com\hds\cn\bi\service\GetUserDataService.class
 com\hds\cn\bi\vo\NewOrgVo.class
 com\hds\cn\bi\controller\QueryByCKController.class
+com\hds\cn\bi\service\impl\QueryByUserDataByCKServiceImpl.class
 com\hds\cn\bi\service\impl\QueryByCKServiceImpl.class
 com\hds\cn\bi\util\CommonConstant.class
 com\hds\cn\bi\service\DataReportService.class
 com\hds\cn\bi\util\BaseServiceImpl.class
 com\hds\cn\bi\mapper\QueryByCKMapper.class
+com\hds\cn\bi\controller\QueryUserDataByCKController.class
 com\hds\cn\bi\vo\PayVo.class
 com\hds\cn\bi\vo\ClientVo.class
 com\hds\cn\bi\util\CommonUtil.class
@@ -22,6 +24,7 @@ com\hds\cn\bi\vo\SourceVo.class
 com\hds\cn\bi\util\EsClient.class
 com\hds\cn\bi\util\DownloadUtil.class
 com\hds\cn\bi\vo\AgentVo.class
+com\hds\cn\bi\service\QueryUserDataByCKService.class
 com\hds\cn\bi\util\SystemException.class
 com\hds\cn\bi\vo\ProductDataVo.class
 com\hds\cn\bi\util\IndexUtil.class
@@ -42,6 +45,7 @@ com\hds\cn\bi\service\GetLightActivityDataService.class
 com\hds\cn\bi\util\DateUtil.class
 com\hds\cn\bi\service\impl\IGetUserDataServiceImpl.class
 com\hds\cn\bi\controller\DataReport.class
+com\hds\cn\bi\mapper\QueryUserDataByCKMapper.class
 com\hds\cn\bi\vo\MultiActivityVo.class
 com\hds\cn\bi\util\BusinessException.class
 com\hds\cn\bi\util\ResponseUtil.class

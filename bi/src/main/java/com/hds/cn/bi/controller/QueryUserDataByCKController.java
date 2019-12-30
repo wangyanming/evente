@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("queryUserDataByCk")
+@RequestMapping("queryUserDataByCK")
 public class QueryUserDataByCKController extends BaseController {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());

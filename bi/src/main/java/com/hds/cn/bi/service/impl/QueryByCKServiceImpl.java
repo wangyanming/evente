@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.hds.cn.bi.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,7 +66,9 @@ public class QueryByCKServiceImpl implements QueryByCKService{
 	}
 
 	@Override
-	public List<Map<String, Object>> getMultiTotalData(Map<String, Object> req) {
+	public Map<String, Object> getMultiTotalData(Map<String, Object> req) {
+		String today = DateUtil.dateStampToDay(System.currentTimeMillis());
+		req.put("today", today);
 		return queryByCKMapper.getMultiTotalData(req);
 	}
 

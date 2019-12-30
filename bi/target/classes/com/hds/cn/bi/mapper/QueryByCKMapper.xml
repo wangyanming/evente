@@ -37,7 +37,7 @@
 			(
 			select 
 				<if test="type == 'hour'">
-					concat(formatDateTime(time,'%F %I'),':00:00') date,
+					concat(formatDateTime(time,'%F %H'),':00:00') date,
 				</if>
 				<if test="type == 'day'">
 					formatDateTime(time, '%F') date,
@@ -56,7 +56,7 @@
 		left join
 			(select 
 				<if test="type == 'hour'">
-					concat(formatDateTime(time,'%F %I'),':00:00') date,
+					concat(formatDateTime(time,'%F %H'),':00:00') date,
 				</if>
 				<if test="type == 'day'">
 					formatDateTime(time, '%F') date,
@@ -343,13 +343,27 @@
 		on a.product_id = b.product_id
 	</select>
 	
-	<select id="getMultiTotalData">
-		
+	<select id="getMultiTotalData" resultType="java.util.HashMap">
+		select a.newUser newUser, b.totalUser totalUser, c.newOrderCnt newOrderCnt, c.newOrderAmount newOrderAmount, d.totalOrderCnt totalOrderCnt from
+			(select uniq(distinct_id) newUser,org_id from evente.em_events_dis where event='SignUp' and
+			org_id=${orgId} and toDate(time)='${today}' group by org_id) a
+		full outer join
+			(select uniq(distinct_id) totalUser,org_id from evente.em_events_dis where event='SignUp'
+			and org_id=${orgId} group by org_id) b
+		on a.org_id=b.org_id
+		full outer join
+			(select uniq(increment_id) newOrderCnt,sum(freight_money + product_sub_price) newOrderAmount,org_id from evente.em_events_dis
+			where event='PaidOrder' and org_id=${orgId} and toDate(time)='${today}' group by org_id) c
+		on a.org_id=c.org_id
+		full outer join
+			(select uniq(increment_id) totalOrderCnt,org_id from evente.em_events_dis
+			where event='PaidOrder' and org_id=${orgId} group by org_id) d
+		on a.org_id=d.org_id
 	</select>
 	
 	<select id="getMultiAgentData" resultType="java.util.LinkedHashMap">
 		select
-			a.device_type agentId,
+			a.agent_id agentId,
 			a.pv pv,
 			a.uv uv,
 			b.orderAmount orderAmount,
@@ -362,39 +376,37 @@
 			select
 				count(distinct_id) pv,
 				uniq(distinct_id) uv,
-				device_type
+				agent_id
 			from
 				evente.em_events_dis
 			where
 				org_id = ${orgId}
 				and event = 'ViewProduct'
-				and device_type in 
+				and agent_id in
 				<foreach collection ="agentIds" item ="item" separator ="," open ="(" close =")"> 
 					${item} 
 				</foreach>
 				and product_type = '${productType}'
-			group by
-				device_type ) a
+			group by agent_id) a
 		left join (
 			select
 				sum(product_sub_price + freight_money) orderAmount,
 				uniq(distinct_id) orderUser,
 				uniq(increment_id) orderCnt,
 				sum(product_number) productCnt,
-				device_type
+				agent_id
 			from
 				evente.em_events_dis
 			where
 				event = 'PaidOrder'
 				and org_id = ${orgId}
-				and device_type in 
+				and agent_id in
 				<foreach collection ="agentIds" item ="item" separator ="," open ="(" close =")"> 
 					${item} 
 				</foreach>
 				and product_type = '${productType}'
-			group by
-				device_type ) b on
-			a.device_type = b.device_type
+			group by agent_id ) b on
+			a.agent_id = b.agent_id
 	</select>
 	
 	<!-- 老版分销开始 -->
@@ -410,7 +422,6 @@
 				and toDate(time) between '${startDate}' and '${endDate}' 
 				and event = 'ViewProduct'
 				and agent_id = ${agentId}
-				and product_type = ${productType}
 			GROUP BY org_id, _province, product_type, agent_id) a
 		LEFT JOIN
 		(
@@ -426,7 +437,6 @@
 				and org_id = ${orgId}
 				and toDate(time) between '${startDate}' and '${endDate}'
 				and agent_id = ${agentId}
-				and product_type = ${productType}
 			GROUP BY org_id,  _province, product_type, agent_id) b
 		on a._province = b._province
 	</select>
@@ -449,7 +459,7 @@
 			(
 				select 
 				<if test="type == 'hour'">
-					concat(formatDateTime(time,'%F %I'),':00:00') date,
+					concat(formatDateTime(time,'%F %H'),':00:00') date,
 				</if>
 				<if test="type == 'day'">
 					formatDateTime(time, '%F') date,
@@ -462,13 +472,12 @@
 				and toDate(time) between '${startDate}' and '${endDate}' 
 				and event = 'ViewProduct'
 				and agent_id = ${agentId}
-				and product_type = ${productType}
 			group by date, org_id, agent_id, product_type,
 				product_id) a
 		left join (
 				select 
 				<if test="type == 'hour'">
-					concat(formatDateTime(time,'%F %I'),':00:00') date,
+					concat(formatDateTime(time,'%F %H'),':00:00') date,
 				</if>
 				<if test="type == 'day'">
 					formatDateTime(time, '%F') date,
@@ -482,7 +491,6 @@
 				and toDate(time) between '${startDate}' and '${endDate}' 
 				and event = 'PaidOrder'
 				and agent_id = ${agentId}
-				and product_type = ${productType}
 			group by
 				date, org_id, agent_id, product_type,
 				product_id) b on
@@ -503,7 +511,7 @@
 			(
 				select 
 				<if test="type == 'hour'">
-					concat(formatDateTime(time,'%F %I'),':00:00') date,
+					concat(formatDateTime(time,'%F %H'),':00:00') date,
 				</if>
 				<if test="type == 'day'">
 					formatDateTime(time, '%F') date,
@@ -516,14 +524,13 @@
 				and toDate(time) between '${startDate}' and '${endDate}' 
 				and event = 'ViewProduct'
 				and agent_id = ${agentId}
-				and product_type = ${productType}
 			group by
 				date, org_id, agent_id, product_type, product_id,
 				channel_id) a
 		left join (
 				select 
 				<if test="type == 'hour'">
-					concat(formatDateTime(time,'%F %I'),':00:00') date,
+					concat(formatDateTime(time,'%F %H'),':00:00') date,
 				</if>
 				<if test="type == 'day'">
 					formatDateTime(time, '%F') date,
@@ -537,7 +544,6 @@
 				and toDate(time) between '${startDate}' and '${endDate}' 
 				and event = 'PaidOrder'
 				and agent_id = ${agentId}
-				and product_type = ${productType}
 			group by
 				date, org_id, agent_id, product_type, product_id,
 				channel_id) b on
@@ -555,7 +561,7 @@
 			(
 				select 
 				<if test="type == 'hour'">
-					concat(formatDateTime(time,'%F %I'),':00:00') date,
+					concat(formatDateTime(time,'%F %H'),':00:00') date,
 				</if>
 				<if test="type == 'day'">
 					formatDateTime(time, '%F') date,
@@ -568,14 +574,13 @@
 				and toDate(time) between '${startDate}' and '${endDate}' 
 				and event = 'ViewProduct'
 				and agent_id = ${agentId}
-				and product_type = ${productType}
 			group by
 				date, org_id, agent_id, product_type, product_id,
 				device_type) a
 		left join (
 				select 
 				<if test="type == 'hour'">
-					concat(formatDateTime(time,'%F %I'),':00:00') date,
+					concat(formatDateTime(time,'%F %H'),':00:00') date,
 				</if>
 				<if test="type == 'day'">
 					formatDateTime(time, '%F') date,
@@ -589,7 +594,6 @@
 				and toDate(time) between '${startDate}' and '${endDate}' 
 				and event = 'PaidOrder'
 				and agent_id = ${agentId}
-				and product_type = ${productType}
 			group by
 				date, org_id, agent_id, product_type, product_id,
 				device_type) b on
@@ -612,7 +616,7 @@
 			event = 'PaidOrder'
 			and org_id = ${orgId}
 			and toDate(time) between '${startDate}' and '${endDate}'
-			and device_type = ${agentId}
+			and agent_id = ${agentId}
 		group by product_id, product_type, org_id, device_type, product_rel_id, product_sub_id		
 	</select>
 	

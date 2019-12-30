@@ -12,7 +12,7 @@ public interface QueryByCKService {
 	public List<Map<String, Object>> getDataByRegion(Map<String, Object> req);
 	public List<Map<String, Object>> getBuyRate(Map<String, Object> req);
 	public List<Map<String, Object>> getMultiActivity(Map<String, Object> req);
-	public List<Map<String, Object>> getMultiTotalData(Map<String, Object> req);
+	public Map<String, Object> getMultiTotalData(Map<String, Object> req);
 	public List<Map<String, Object>> getMultiProductData(Map<String, Object> req);
 	public List<Map<String, Object>> getMultiProductDataByProductId(Map<String, Object> req);
 	public List<Map<String, Object>> getMultiAgentData(Map<String, Object> req);

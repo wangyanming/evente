@@ -796,7 +796,8 @@ public class EsUtil {
 	public static BoolQueryBuilder multiAgentBqb(Map<String, Object> requestMap) {
 		BoolQueryBuilder bqb = QueryBuilders.boolQuery();
 		if (null != requestMap.get("startDate")) {
-			bqb.must(QueryBuilders.rangeQuery("start_time.keyword").gte(requestMap.get("startDate")).lte(requestMap.get("endDate"))); //gt:大于 lt:小于
+			//gt:大于 lt:小于
+			bqb.must(QueryBuilders.rangeQuery("start_time.keyword").gte(requestMap.get("startDate")).lte(requestMap.get("endDate")));
 		}
 		bqb.must(QueryBuilders.matchQuery("org_id", requestMap.get("orgId"))); 
 		bqb.must(QueryBuilders.matchQuery("event_type", "ViewProduct")); 
