@@ -9,12 +9,12 @@
       <change afterPath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/mapper/QueryUserDataByCKMapper.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/service/QueryUserDataByCKService.class" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/service/impl/QueryByUserDataByCKServiceImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../hdsbi/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../register/.idea/$PRODUCT_WORKSPACE_FILE$" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../register/.idea/.gitignore" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../register/register.iml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../workspace.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bi/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/src/main/java/com/hds/cn/bi/controller/QueryByCKController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/src/main/java/com/hds/cn/bi/controller/QueryByCKController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/src/main/java/com/hds/cn/bi/controller/QueryUserDataByCKController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/src/main/java/com/hds/cn/bi/controller/QueryUserDataByCKController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/src/main/java/com/hds/cn/bi/mapper/QueryByCKMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/src/main/java/com/hds/cn/bi/mapper/QueryByCKMapper.java" afterDir="false" />
@@ -28,36 +28,33 @@
       <change beforePath="$PROJECT_DIR$/../bi/src/main/resources/jdbc.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/src/main/resources/jdbc.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/src/main/resources/logback-spring.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/src/main/resources/logback-spring.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/bi.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/bi.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../bi/target/bi.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/bi.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bi/target/bi.jar.original" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bi/target/classes/application.properties" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/controller/QueryByCKController.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/controller/QueryByCKController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/mapper/QueryByCKMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/mapper/QueryByCKMapper.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/mapper/QueryByCKMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/mapper/QueryByCKMapper.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/service/QueryByCKService.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/service/QueryByCKService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/service/impl/QueryByCKServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/service/impl/QueryByCKServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/util/EsUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/classes/com/hds/cn/bi/util/EsUtil.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bi/target/classes/jdbc.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../bi/target/classes/logback-spring.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../bi/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/../bi/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../hdsbi/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../hdsbi/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../hdsbi/src/main/java/com/hdsbi/controller/QueryByCkController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../hdsbi/src/main/java/com/hdsbi/controller/QueryByCkController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hdy_app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/hdy_app.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hds/hdyapp/mapper/QueryByCKMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hds/hdyapp/mapper/QueryByCKMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hds/hdyapp/service/impl/QueryByCKServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hds/hdyapp/service/impl/QueryByCKServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hds/hdyapp/util/DateUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hds/hdyapp/util/DateUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resource/application-pro.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resource/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resource/jdbc.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/jdbc.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resource/logback-spring.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/logback-spring.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application-pro.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/hdy_app.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/hdy_app.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/hdy_app.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/hdy_app.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/logback-spring.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/logback-spring.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/jdbc.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/logback-spring.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/hdy_app.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/hdy_app.jar.original" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/TEST-com.hds.cn.hds_app.AppTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/surefire-reports/TEST-com.hds.cn.hds_app.AppTest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/surefire-reports/com.hds.cn.hds_app.AppTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/target/surefire-reports/com.hds.cn.hds_app.AppTest.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -156,6 +153,14 @@
       <option name="presentableId" value="Default" />
       <updated>1570602300639</updated>
     </task>
+    <task id="LOCAL-00001" summary="更新">
+      <created>1576837252691</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1576837252691</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -170,5 +175,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="更新" />
+    <option name="LAST_COMMIT_MESSAGE" value="更新" />
   </component>
 </project>
