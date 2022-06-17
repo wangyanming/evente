@@ -21,7 +21,7 @@
 		<commons.lang.version>2.6</commons.lang.version>
 		<druid.version>1.1.12</druid.version>
 		<clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
-		<alibaba.fastjson.version>1.2.44</alibaba.fastjson.version>
+		<alibaba.fastjson.version>1.2.83</alibaba.fastjson.version>
 		<json.lib.version>2.3</json.lib.version>
 		<kryo.version>4.0.0</kryo.version>
 		<kryo.serializers.version>0.45</kryo.serializers.version>
